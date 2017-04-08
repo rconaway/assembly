@@ -1,0 +1,35 @@
+Rob Conaway
+Artisan at Pillar Technology
+rconaway at pillartechnology dot com
+
+Altair: https://en.wikipedia.org/wiki/Altair_8800
+8080 processor, precursor to 8086
+
+Raspberry Pi, Arduino 
+ARM https://en.wikipedia.org/wiki/ARM_architecture
+
+https://github.com/rconaway/assembly
+
+main, fibonacci, common
+aunit, tests
+assembler tool chain diagram:
+    https://www.lucidchart.com/invitations/accept/6520fada-38c5-4a58-a750-6d7fedac6694
+
+build
+---------------------------------------------------------
+bin/main 20
+gdb bin/main -x .gdbinit -x startup.gdb
+
+bits/bytes/words,hex,endian oh yeah
+
+system call numbers:
+    http://lxr.free-electrons.com/source/arch/arm/kernel/calls.S?v=2.2.26
+
+NZCV
+si
+
+broad or deep?
+
+http://www.davespace.co.uk/arm/introduction-to-arm/conditional.html
+
+

@@ -1,23 +1,25 @@
 	.file "library.S"
 
-	.data
-saved_registers:
-	.space 64
-
-heap:
-	.word	0
-	.space 0x10000
-
-heap_end:
-
-heap_next:
-	.word heap
+	.equ write, 4
 
 	.text
 
 	.global out
+/*
+	out - display null-terminated string to STDOUT
+
+	on entry:
+	    r1 => string to display
+
+	on exit:
+	    r0, r2 changed
+	    r1 => string to display (unchanged)
+*/
+
 out:
 	push	{r7, lr}
+
+	// find the null terminator
 	mov	r2, r1
 
 out_find_z:
@@ -26,9 +28,16 @@ out_find_z:
 	addne	r2, #1
 	bne	out_find_z
 
+	// compute length of string
 	sub	r2, r1	
+
+	// system call to display string
+	//	r0 = file handle (1 for STDOUT)
+	//	r1 => string
+	//	r2 = length of string
+	//	r7 = system call (4 = write file)
 	mov	r0, #1
-	mov	r7, #4
+	mov	r7, #write
 	swi	0
 
 	pop	{r7, pc}
@@ -153,65 +162,39 @@ reverse_text_exit:
 int_to_text:
 	push	{r1, r4, lr}
 
+	// remember where the buffer starts
 	mov	r4, r1
 
+	// r2 starts with original number
 	mov	r2, r0
+
+	// r3 is the working buffer pointer
 	mov	r3, r1
 
 int_to_text_loop:
+	// shift a decimal digit out of r2 into r1
 	mov	r0, r2	
 	bl	shift_10
 	mov	r2, r0
 
+	// convert the digit to ascii and store in buffer
 	mov	r0, r1
-	bl	digit_to_text
+	add	r0, #'0'
 	strb	r0, [r3], #1
 
+	// if nothing left to shift, then we're done
 	cmp	r2, #0
 	bne	int_to_text_loop
 
+	// store a null byte at the end of the buffer
 	mov	r0, #0
 	strb	r0, [r3]
+
+	// reverse the buffer
 	mov	r0, r4
 	bl	reverse_text
 
-	mov	r1, #0
-	strb	r1, [r3]
-
 	pop	{r1, r4, pc}
-
-itoa:
-	@ > r0 = i
-	@ > r1 => text buffer
-	@ < r0 = len
-	@ < r1 = text buffer
-
-text_buffer .req r4
-text_ptr .req r3
-remainder .req r2
-
-	stmfd	sp!,{r4}
-
-	mov	text_buffer, r1
-	mov	text_ptr, r1
-	mov	remainder, r0
-
-itoa_loop:
-	mov	r1, remainder
-	bl	shift_10
-	mov	remainder, r1
-
-	bl	digit_to_text
-	strb	r0, [text_ptr], #1
-
-	cmp	remainder, #0
-	bne	itoa_loop
-
-	sub	r0, text_ptr, text_buffer
-	mov	r1, text_buffer
-
-	ldmfd	sp!,{r4}
-	mov	pc, lr
 
 /*
 	shift_10 - "shift" the lowest decimal digit out of an integer
@@ -238,49 +221,55 @@ shift_10:
 
 
 /*
-	digit_to_text - convert a single digit to ascii text
+	text_to_int - convert text to an integer
 
 	on entry:
-		r0 = digit (0x00 - 0x09)
-
+	    r1 => null-terminated text
+	    
 	on exit:
-		r0 = text ('0' - '9')
+	    if success:
+		r0 = integer
+		eq = true
+	    if failure:
+		r0 = undefined
+		eq = false	    
 */
-	.global digit_to_text
-digit_to_text:
-	add	r0, #'0'
-	mov	pc, lr
-
-
 	.global text_to_int
 text_to_int:
-	push	{r4}
+	// initialize accumulator
 	mov	r0, #0
+
+	// constant 10 for use later
 	mov	r3, #10
 
-text_to_int_loop:	
+text_to_int_loop:
+	// get the next character then bump the text pointer
 	ldrb	r2, [r1], #1
+
+	// if character is null, we're done
 	cmp	r2, #0
 	beq	text_to_int_end
-	
-	cmp	r2, #'0'
-	blt	text_to_int_error
-	cmp	r2, #'9'
-	bgt	text_to_int_error
 
-	mul	r4, r0, r3
-	mov	r0, r4
-	sub	r2, r2, #0x30
-	add	r0, r0, r2
+	// verify character between '0' and '9'	
+	cmp	r2, #'0'
+	blt	text_to_int_end
+	cmp	r2, #'9'
+	bgt	text_to_int_end
+
+	// convert ascii to binary
+	sub	r2, #0x30
+
+	// shift the accumulator left one digit
+	mul	r0, r3
+
+	// add the new digit
+	add	r0, r2
+
+	// go get the next character
 	b	text_to_int_loop
 
 text_to_int_end:
-	pop	{r4}
 	mov	pc, lr		
-
-text_to_int_error:
-	mov	r0, #-1
-	b	text_to_int_end
 
 
 /*

@@ -1,51 +1,68 @@
-	.file	"fibonacci.S"
-
-	.global	_start
+	.file	"main.S"
 
 	.data
 
 usage_text: 		.asciz "Usage: fibonacci <count>\n"
 display_buffer: 	.space 100	
-
+life: 
+			.word 0x42424242
 	.text
 
+/*
+	_start - display first n fibonacci numbers
+
+	on entry:
+	    stack + 0 = parameter count
+	    stack + 4 => name of program (null-terminated)
+	    stack + 8 => first parameter (null-terminated)
+
+	
+*/
+	.global	_start
 _start:
-	// alias registers for readability
-	rIndex	.req	r7
-	rCount	.req	r8
-
-	// r0 = count from command line
+	// parse command line, returning n in r0
 	bl	parse_command_line
-	cmp	r0, #-1
-	blt	usage
+	bne	usage		// NE means error
 
-	// looping from 1 to count
-	mov	rCount, r0
-	mov	rIndex, #1
+	// the index (r7) starts at 1
+	// r8 remembers how many numbers were requested
+	mov	r7, #1
+	mov	r8, r0
 
 loop:
-	cmp	rIndex, rCount
+	// loop terminates when index (r7) > n (r8)
+	cmp	r7, r8
 	movgt	r0, #0
 	bgt	exit
 
-	mov	r0, rIndex
+	// get the nth fibonacci number
+	mov	r0, r7
 	bl	fibonacci
+
+	// convert it to text
 	ldr	r1, =display_buffer
 	bl	int_to_text
 	bl	add_nl
+
+	// display it
 	bl	out
-	
+
+	// end of loop		
 	add	r7, #1
 	b	loop
 
 usage:
+	// display the text in usage_text
 	ldr	r1, =usage_text
 	bl	out
 
+	// set return code = -1
 	mov 	r0, #-1
 	b	exit
 
 exit:
+	// makes system call to exit
+	// assumes r0 has return code
 	mov	r7, #1
 	swi	0
 	

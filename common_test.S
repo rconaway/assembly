@@ -107,15 +107,6 @@ BEGIN_TEST reverse_text_odd
 END_TEST
 
 
-BEGIN_TEST digit_to_text_test
-	mov	r0, #4
-	bl	digit_to_text
-
-	cmp	r0, #'4'
-	a_eq	"digit_to_text did not convert 4 to '4'"
-END_TEST
-
-
 BEGIN_TEST shift_10_zero
 	mov	r0, #0
 	bl	shift_10
@@ -227,8 +218,7 @@ BEGIN_TEST text_to_int_invalid
 
 	bl	text_to_int
 
-	cmp 	r0, #-1
-	a_eq	"invalid is not -1"
+	a_ne	"error not reported for invalid input"
 END_TEST
 
 BEGIN_TEST copy_string_test

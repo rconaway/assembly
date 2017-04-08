@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Needs inotify-tools:
+#    sudo apt-get install inotify-tools
+
 while true; do
   ./build 
   inotifywait -q -r -e modify,move,create,delete *.S

@@ -1,0 +1,3 @@
+gdb bin/hello -x .gdbinit -x hello_startup.gdb
+
+

@@ -54,8 +54,8 @@ BEGIN_TEST fibonacci_2
 
 	bl	fibonacci
 
-	cmp	r0, #2
-	a_eq	"second number should be 2"
+	cmp	r0, #1
+	a_eq	"second number should be 1"
 END_TEST
 
 BEGIN_TEST fibonacci_3
@@ -63,8 +63,8 @@ BEGIN_TEST fibonacci_3
 
 	bl	fibonacci
 
-	cmp	r0, #3
-	a_eq	"third number should be 3"
+	cmp	r0, #2
+	a_eq	"third number should be 2"
 END_TEST
 
 BEGIN_TEST fibonacci_4
@@ -72,8 +72,17 @@ BEGIN_TEST fibonacci_4
 
 	bl	fibonacci
 
-	cmp	r0, #5
-	a_eq	"fourth number should be 5"
+	cmp	r0, #3
+	a_eq	"fourth number should be 3"
+END_TEST
+
+BEGIN_TEST fibonacci_6
+	mov	r0, #6
+
+	bl	fibonacci
+
+	cmp	r0, #8
+	a_eq	"fourth number should be 8"
 END_TEST
 
 END_TEST_LIST

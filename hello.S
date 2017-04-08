@@ -1,17 +1,30 @@
+	.file "hello.S"
+
 	.data
-str:	.ascii "Hello World\n"
-	.equ	str_len, .-str
+
+hello:		.asciz "Hello, "
+default_name: 	.asciz "whoever you are"
+bang:		.asciz "!\n"
+buffer:		.space 1000
 
 	.text
 	.global _start
 
-_start:	
-	mov	r7, #4
-	mov	r0, #1
-	mov 	r2, #str_len
-	ldr	r1, =str
-	swi	0
+_start:
+	ldr	r0, [sp]
+	cmp	r0, #2
+	
+	ldrge	r4, [sp, #8]
+	ldrlt	r4, =default_name
 
+	ldr	r1, =hello
+	bl	out
+	mov	r1, r4
+	bl	out
+	ldr	r1, =bang
+	bl	out
+	
+	mov 	r0, #0
 	mov 	r7, #1
 	swi	0
 
