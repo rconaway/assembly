@@ -8,3 +8,4 @@ hello
 *.i
 *.s
 .gdb_history
+bin/

@@ -1,0 +1,6 @@
+as -ggdb -o main.o main.S
+as -ggdb -o system.o system.S
+as -ggdb -o test.o test.S
+ld -o main main.o system.o
+ld -o test test.o system.o
+

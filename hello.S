@@ -1,13 +1,17 @@
 	.data
-str:	.asciz "Hello World\n"
+str:	.ascii "Hello World\n"
+	.equ	str_len, .-str
 
 	.text
-	.global main
+	.global _start
 
-main:	stmfd	sp!,{lr}
-	ldr	r0, =str
-	bl	printf
-	mov	r0, #0
-	ldmfd	sp!,{lr}
-	mov	pc, lr
+_start:	
+	mov	r7, #4
+	mov	r0, #1
+	mov 	r2, #str_len
+	ldr	r1, =str
+	swi	0
+
+	mov 	r7, #1
+	swi	0
 

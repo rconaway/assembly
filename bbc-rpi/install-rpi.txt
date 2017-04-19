@@ -1,0 +1,26 @@
+Update your Raspberry Pi:
+
+sudo apt-get update
+sudo apt-get dist-upgrade
+
+Install SDL 2.0:
+
+sudo apt-get install libsdl2-2.0-0
+sudo apt-get install libsdl2-ttf-2.0-0
+sudo apt-get install mesa-utils
+chmod +x bbcsdl
+
+To start BBC BASIC:
+
+./bbcsdl
+
+Or if you have a touchscreen:
+
+./bbcsdl examples/tools/touchide.bbc
+
+For the best performance you need to enable the experimental GL Driver
+(sudo raspi-config... Advanced Options... GL Driver).  At the time of
+writing this is not compatible with all screens so some experimentation
+may be required.  If you are unable to use it BBC BASIC will run slowly.
+
+RTR 19-Feb-2017
