@@ -1,6 +1,6 @@
 #! /bin/bash
 
 while true; do
-  ./build && ./test
+  ./build 
   inotifywait -q -r -e modify,move,create,delete *.S
 done

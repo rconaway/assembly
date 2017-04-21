@@ -1,7 +1,0 @@
-gcc -save-temps -o fibonacci_c fibonacci.c
-gcc -ggdb -o fibonacci_s fibonacci.S
-
-./fibonacci_c 20 > expected
-./fibonacci_s 20 > actual
-diff actual expected
-
