@@ -39,5 +39,37 @@ BEGIN_TEST parse_command_line_valid
 	ASSERT_EQ "did not convert parameter correctly"
 END_TEST
 
+BEGIN_TEST fibonacci_1
+	mov	r0, #1
+	bl	fibonacci
+
+	cmp	r0, #1
+	ASSERT_EQ "first number should be 1"
+END_TEST
+
+BEGIN_TEST fibonacci_2
+	mov	r0, #2
+	bl	fibonacci
+
+	cmp	r0, #2
+	ASSERT_EQ "second number should be 2"
+END_TEST
+
+BEGIN_TEST fibonacci_3
+	mov	r0, #3
+	bl	fibonacci
+
+	cmp	r0, #3
+	ASSERT_EQ "third number should be 3"
+END_TEST
+
+BEGIN_TEST fibonacci_4
+	mov	r0, #4
+	bl	fibonacci
+
+	cmp	r0, #5
+	ASSERT_EQ "fourth number shouldbe 5"
+END_TEST
+
 END_TEST_LIST
 

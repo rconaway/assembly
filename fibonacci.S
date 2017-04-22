@@ -39,7 +39,7 @@ loop:
 	bgt	exit
 
 	mov	r0, r7
-	//bl	fibonacci
+	bl	fibonacci
 	ldr	r1, =display_buffer
 	bl	int_to_text
 	bl	add_nl
@@ -59,65 +59,24 @@ exit:
 	mov	r7, #1
 	swi	0
 	
-
+	.global fibonacci
 fibonacci:
-	mov	pc, lr
+	push	{r4,r5,lr}
+	cmp	r0, #2
+	ble	fibonacci_exit
 
-	@ save caller context
-	stmfd	sp!, {r4, fp, lr}
-
-	@ setup the stack frame
-	add	fp, sp, #8
-	sub	sp, sp, #12
-
-	@ save n
-	str	r0, [fp, #fib_n]
-
-.test_0:
-	@ if n is not 0, continue 
-	ldr	r3, [fp, #fib_n]
-	cmp	r3, #0
-	bne	.test_1
-
-	@ else return 0
-	mov	r3, #0
-	b	.fibonacci_exit
-
-.test_1:
-	ldr	r3, [fp, #fib_n]
-	cmp	r3, #1
-	bne	.recurse
-	mov	r3, #1
-	b	.fibonacci_exit
-
-.recurse:
-	@ subtract 1 from n then call Fibonacci
-	ldr	r3, [fp, #fib_n]
-	sub	r3, r3, #1
-	mov	r0, r3
-	bl	fibonacci
 	mov	r4, r0
-
-	@ subtract 2 from n then call Fibonacci
-	ldr	r3, [fp, #fib_n]
-	sub	r3, r3, #2
-	mov	r0, r3
+	sub	r0, #1
 	bl	fibonacci
-	mov	r3, r0
-
-	@ add the results
-	add	r3, r4, r3
-
-.fibonacci_exit:
-	mov	r0, r3
-
-	@ restore the context from caller
-	sub	sp, fp, #8
-	ldmfd	sp!, {r4, fp, pc}
+	mov	r5, r0
+	mov	r0, r4
+	sub	r0, #2
+	bl	fibonacci
+	add	r0, r5
 	
-itoa:
-	mov	pc, lr
-
+fibonacci_exit:
+	pop	{r4,r5,pc}
+	
 /*
 	parse_command_line - get count from command line
 
