@@ -26,7 +26,6 @@ test_list:
 	.asciz	"test: \name\n"
 	.text
 \name:
-	bl	heap_reset
 .endm
 
 

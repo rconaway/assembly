@@ -1,3 +1,0 @@
-tmux split-window -h 'vim'
-tmux split-window -v 'vim'
-

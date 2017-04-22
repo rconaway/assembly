@@ -127,59 +127,154 @@ inline_string_end:
 	pop	{r0,r1}
 	mov	pc, lr
 
-	.global heap_allocate
-heap_allocate:
-	ldr	r2, =heap_next
-	ldr	r1, [r2]
-	ldr	r3, [r2]
-	add	r3, r0
-	str	r3, [r2]
+/*
+	reverse_text - reverse characters in a null-terminated string
+
+	on entry:
+		r0 = address of string
+
+	on exit:
+		r0 unchanged
+*/
+	.global reverse_text
+reverse_text:
+	push	{r1-r4, lr}
+	mov	r1, r0
+	mov	r2, r0
+
+reverse_text_2:
+	ldrb	r3, [r2]
+	cmp	r3, #0
+	beq	reverse_text_1
+	add	r2, #1
+	b	reverse_text_2
+
+reverse_text_1:
+	sub	r2, #1
+
+reverse_text_loop:
+	cmp	r1, r2
+	bge	reverse_text_exit
+	ldrb	r3, [r1]
+	ldrb	r4, [r2]
+	strb	r3, [r2], #-1
+	strb	r4, [r1], #1
+	b	reverse_text_loop	
+
+reverse_text_exit:	
+	pop	{r1-r4, pc}
+
+/*
+	int_to_text - convert integer to decimal text
 	
+	on entry:
+		r0 = integer to convert
+		r1 = buffer to place the text
+	on exit:
+		r0 = length of text
+		r1 = original buffer
+*/
+	.global int_to_text
+int_to_text:
+	push	{r1, r2, r3,r4, lr}
+
+	mov	r4, r1
+
+	mov	r2, r0
+	mov	r3, r1
+
+int_to_text_loop:
+	mov	r0, r2	
+	bl	shift_10
+	mov	r2, r0
+
+	mov	r0, r1
+	bl	digit_to_text
+	strb	r0, [r3], #1
+
+	cmp	r2, #0
+	bne	int_to_text_loop
+
+	mov	r0, r4
+	bl	reverse_text
+
+	mov	r0, r3 
+	sub	r0, r4
+
+	mov	r1, #0
+	strb	r1, [r3]
+
+	pop	{r1, r2, r3, r4, pc}
+
+itoa:
+	@ > r0 = i
+	@ > r1 => text buffer
+	@ < r0 = len
+	@ < r1 = text buffer
+
+text_buffer .req r4
+text_ptr .req r3
+remainder .req r2
+
+	stmfd	sp!,{r4}
+
+	mov	text_buffer, r1
+	mov	text_ptr, r1
+	mov	remainder, r0
+
+itoa_loop:
+	mov	r1, remainder
+	bl	shift_10
+	mov	remainder, r1
+
+	bl	digit_to_text
+	strb	r0, [text_ptr], #1
+
+	cmp	remainder, #0
+	bne	itoa_loop
+
+	sub	r0, text_ptr, text_buffer
+	mov	r1, text_buffer
+
+	ldmfd	sp!,{r4}
 	mov	pc, lr
 
-	.global heap_append_string
-heap_append_string:
-	ldr	r0, =heap_next
-	ldr	r2, [r0]
+/*
+	shift_10 - "shift" the lowest decimal digit out of an integer
 
-heap_append_string_skip:
-	ldrb	r0,[r2], #1
-	cmp	r0, #0
-	bne	heap_append_string_skip
-	sub	r2, #1	// write over null-terminator
+	on entry:
+		r0 = integer to shift
+	
+	on exit:
+		r0 = integer / 10
+		r1 = integer mod 10
+*/
+	.global shift_10
+shift_10:
+	push	{r4, r5, r6, lr}
 
-heap_append_string_copy:
-	ldrb	r0, [r1], #1
-	strb	r0, [r2], #1
-	cmp	r0, #0
-	bne	heap_append_string_copy
-	mov	r1, r2
+	mov	r4, #10
+	udiv	r5, r0, r4
+	mul	r6, r5, r4
+	mov	r1, r0
+	sub	r1, r6
+	mov	r0, r5
 
-	mov 	pc, lr	
+	pop	{r4, r5, r6, pc}
 
-	.global heap_allocate_string
-heap_allocate_string:
-	ldr	r0, =heap_next
-	ldr	r1, [r0]
-	mov	r2, r1
 
-heap_allocate_string_skip:
-	ldrb	r0, [r2], #1
-	cmp	r0, #0
-	bne	heap_allocate_string_skip
+/*
+	digit_to_text - convert a single digit to ascii text
 
-	ldr	r0, =heap_next
-	str	r2, [r0]
+	on entry:
+		r0 = digit (0x00 - 0x09)
 
+	on exit:
+		r0 = text ('0' - '9')
+*/
+	.global digit_to_text
+digit_to_text:
+	add	r0, #'0'
 	mov	pc, lr
 
-	.global heap_reset
-heap_reset:
-	ldr	r0, =heap_next
-	ldr	r1, =heap
-	str	r1, [r0]
-	mov	r0, #0
-	str	r0, [r1]
-
-	mov	pc, lr
 

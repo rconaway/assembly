@@ -14,6 +14,20 @@ inline_string_3_character_expected:
 inline_string_4_character_expected:
 	.asciz	"abcd"
 
+empty_string:
+	.asciz ""
+
+abcd:
+	.asciz "abcd"
+
+dcba:	
+	.asciz "dcba"
+
+abc:	.asciz "abc"
+cba:	.asciz "cba"
+
+buffer:	.space 1000
+
 	.text
 
 BEGIN_TEST_LIST
@@ -93,69 +107,130 @@ BEGIN_TEST inline_string_4_character
 	ASSERT_EQ "did not match\n" 
 END_TEST
 
-BEGIN_TEST heap_allocate_zero_bytes
-	mov	r0, #0
-	bl	heap_allocate
-	mov 	r4, r1
-	bl	heap_allocate
-	cmp	r1, r4
+BEGIN_TEST reverse_text_empty
+	ldr	r0, =empty_string
+	bl 	reverse_text
 
-	ASSERT_EQ "heap was changed\n"
+	mov	r2, r0
+	INLINE r1, ""
+	bl	text_eq
+	ASSERT_EQ "reverse_string did not work for empty string\n"
 END_TEST
 
-BEGIN_TEST heap_allocate_n_bytes
-	mov	r0, #0
-	bl	heap_allocate
-	mov	r4, r1
+BEGIN_TEST reverse_text_even
+	ldr	r0, =abcd
+	bl	reverse_text
 
+	mov	r2, r0
+	INLINE	r1, "dcba"
+	bl	text_eq
+	ASSERT_EQ "reverse_string did not work for even number of characters\n"
+END_TEST
+
+BEGIN_TEST reverse_text_odd
+	ldr	r0, =abc
+	bl	reverse_text
+
+	mov	r2, r0
+	INLINE	r1, "cba"
+	bl	text_eq
+	ASSERT_EQ "reverse_string did not work for odd number of characters\n"
+END_TEST
+
+
+BEGIN_TEST digit_to_text_test
+	mov	r0, #4
+	bl	digit_to_text
+	cmp	r0, #'4'
+	ASSERT_EQ "digit_to_text did not convert 4 to '4'\n"
+END_TEST
+
+
+BEGIN_TEST shift_10_zero
+	mov	r0, #0
+	bl	shift_10
+	
+	cmp	r0, #0
+	cmpeq	r1, #0
+
+	ASSERT_EQ "was not zero\n"
+END_TEST
+
+
+BEGIN_TEST shift_10_one_digit
+	mov	r0, #1
+	bl	shift_10
+	
+	cmp	r0, #0
+	cmpeq	r1, #1
+
+	ASSERT_EQ "test_shift_10_one_digit failed\n"
+END_TEST
+
+
+BEGIN_TEST shift_10_two_digits
 	mov	r0, #42
-	bl	heap_allocate
-	cmp	r4, r1
-	ASSERT_EQ "allocated memory is not at expected location\n"
-
-	bl	heap_allocate
-	add	r4, #42
-	cmp	r4, r1
-	ASSERT_EQ "did not allocate 42 bytes\n"
+	bl	shift_10
+	
+	cmp	r0, #4
+	cmpeq	r1, #2
+	
+	ASSERT_EQ "test_shift_10_two_digits failed\n"
 END_TEST
 
-BEGIN_TEST heap_append_empty_string
-	INLINE	r1, ""
 
-	bl	heap_append_string
-	mov	r4, r1
+BEGIN_TEST int_to_text_zero
+	mov	r0, #0
+	ldr	r1, =buffer	
+	bl	int_to_text
 	
-	INLINE	r1, ""
-	mov	r2, r4
-	bl	text_eq 
-	
-	ASSERT_EQ "did not allocate empty string\n"
-END_TEST
+	cmp	r0, #1
+	ASSERT_EQ "did not return length\n"
 
-BEGIN_TEST heap_allocate_string_init
-	bl	heap_allocate_string
-	INLINE	r2, ""
-	bl	text_eq
-	ASSERT_EQ "did not init correctly\n"
-END_TEST
+	ldr	r2, =buffer
+	cmp	r1, r2
+	ASSERT_EQ "did not return buffer\n"
 
-BEGIN_TEST heap_append_string_test
-
-	INLINE	r1, "foo"
-	bl	heap_append_string
-	
-	INLINE	r1, "bazoo"
-	bl	heap_append_string
-
-	bl	heap_allocate_string
-
-	mov	r2, r1
-	INLINE	r1,"foobazoo"
+	INLINE	r2, "0"
 
 	bl	text_eq
-	ASSERT_EQ "result was not 'foobazoo'"
+	ASSERT_EQ "did not convert int correctly\n"
 END_TEST
 
+
+BEGIN_TEST int_to_text_one_digit
+	mov	r0, #1
+	ldr	r1, =buffer	
+	bl	int_to_text
+	
+	cmp	r0, #1
+	ASSERT_EQ "did not return length\n"
+
+	ldr	r2, =buffer
+	cmp	r1, r2
+	ASSERT_EQ "did not return buffer\n"
+
+	INLINE	r2, "1"
+	bl	text_eq
+	ASSERT_EQ "did not convert int correctly\n"
+END_TEST
+
+BEGIN_TEST int_to_text_two_digits
+	mov	r0, #42
+	ldr	r1, =buffer	
+	bl	int_to_text
+	
+	cmp	r0, #2
+	ASSERT_EQ "did not return length\n"
+
+	ldr	r2, =buffer
+	cmp	r1, r2
+	ASSERT_EQ "dod not return buffer\n"
+
+	INLINE r2, "42"
+	bl	text_eq
+	ASSERT_EQ "did not convert int correctly\n"
+END_TEST
 
 END_TEST_LIST
 
