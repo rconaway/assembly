@@ -26,6 +26,7 @@ test_list:
 	.asciz	"test: \name\n"
 	.text
 \name:
+	bl	heap_reset
 .endm
 
 
@@ -35,6 +36,24 @@ test_list:
 
 .macro FAIL
 	b fail_test
+.endm
+
+.macro	ASSERT_EQ message
+	beq	1f
+	bl	inline_string
+	.asciz "\message"
+	.align 4
+	pop	{r1}
+	bl	out
+	b	next_test
+1:
+.endm
+
+.macro INLINE register, string
+	bl	inline_string
+	.asciz	"\string"
+	.align 4
+	pop	{\register}
 .endm
 
 	.global _start
@@ -64,8 +83,10 @@ after_test:
         swi     0
 
 fail_test:
+	bl	save_registers
 	ldr	r1, =fail_message
 	bl	out
+	@bl	report_registers
 	ldr	r1, =failures
 	ldr	r0, [r1]
 	add	r0, #1
