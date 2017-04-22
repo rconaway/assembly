@@ -13,7 +13,7 @@ BEGIN_TEST parse_command_line_no_parameter
 
 	bl	parse_command_line
 	cmp	r0, #-1
-	ASSERT_EQ "did not fail on no parameter"
+	ASSERT EQ "did not fail on no parameter"
 
 END_TEST
 
@@ -25,7 +25,7 @@ BEGIN_TEST parse_command_line_invalid_parameter
 
 	bl parse_command_line
 	cmp	r0, #-1
-	ASSERT_EQ "did not fail on invalid parameter"
+	ASSERT EQ "did not fail on invalid parameter"
 END_TEST
 
 BEGIN_TEST parse_command_line_valid
@@ -36,7 +36,7 @@ BEGIN_TEST parse_command_line_valid
 
 	bl 	parse_command_line
 	cmp	r0, #42
-	ASSERT_EQ "did not convert parameter correctly"
+	ASSERT EQ "did not convert parameter correctly"
 END_TEST
 
 BEGIN_TEST fibonacci_1
@@ -44,7 +44,7 @@ BEGIN_TEST fibonacci_1
 	bl	fibonacci
 
 	cmp	r0, #1
-	ASSERT_EQ "first number should be 1"
+	ASSERT EQ "first number should be 1"
 END_TEST
 
 BEGIN_TEST fibonacci_2
@@ -52,7 +52,7 @@ BEGIN_TEST fibonacci_2
 	bl	fibonacci
 
 	cmp	r0, #2
-	ASSERT_EQ "second number should be 2"
+	ASSERT EQ "second number should be 2"
 END_TEST
 
 BEGIN_TEST fibonacci_3
@@ -60,7 +60,7 @@ BEGIN_TEST fibonacci_3
 	bl	fibonacci
 
 	cmp	r0, #3
-	ASSERT_EQ "third number should be 3"
+	ASSERT 	EQ, "third number should be 3"
 END_TEST
 
 BEGIN_TEST fibonacci_4
@@ -68,7 +68,7 @@ BEGIN_TEST fibonacci_4
 	bl	fibonacci
 
 	cmp	r0, #5
-	ASSERT_EQ "fourth number shouldbe 5"
+	ASSERT 	EQ, "fourth number should be 5"
 END_TEST
 
 END_TEST_LIST

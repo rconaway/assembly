@@ -39,7 +39,7 @@ BEGIN_TEST save_registers_r0
 
 	ldr	r0, [r1, #0]
 	cmp	r0, #42
-	ASSERT_EQ "r0 was not saved correctly\n"
+	ASSERT  EQ,  "r0 was not saved correctly\n"
 END_TEST
 
 BEGIN_TEST save_registers_r1
@@ -48,7 +48,7 @@ BEGIN_TEST save_registers_r1
 
 	ldr	r0, [r1, #4]
 	cmp	r0, #42
-	ASSERT_EQ "r1 was not saved correctly\n"
+	ASSERT  EQ,  "r1 was not saved correctly\n"
 END_TEST
 
 BEGIN_TEST save_registers_lr
@@ -58,7 +58,7 @@ BEGIN_TEST save_registers_lr
 
 	ldr	r0, [r1, #56]
 	cmp	r0, r2
-	ASSERT_EQ "lr was not saved correctly\n"
+	ASSERT  EQ,  "lr was not saved correctly\n"
 	pop	{lr}
 END_TEST
 
@@ -68,7 +68,7 @@ BEGIN_TEST inline_string_empty
 	ldr	r2,=inline_string_empty_expected
 	bl	text_eq
 
-	ASSERT_EQ "did not match\n" 
+	ASSERT  EQ,  "did not match\n" 
 END_TEST
 
 BEGIN_TEST inline_string_1_character
@@ -77,7 +77,7 @@ BEGIN_TEST inline_string_1_character
 	ldr	r2,=inline_string_1_character_expected
 	bl	text_eq
 
-	ASSERT_EQ "did not match\n" 
+	ASSERT  EQ,  "did not match\n" 
 END_TEST
 
 BEGIN_TEST inline_string_2_character
@@ -86,7 +86,7 @@ BEGIN_TEST inline_string_2_character
 	ldr	r2,=inline_string_2_character_expected
 	bl	text_eq
 
-	ASSERT_EQ "did not match\n" 
+	ASSERT  EQ,  "did not match\n" 
 END_TEST
 
 BEGIN_TEST inline_string_3_character
@@ -95,7 +95,7 @@ BEGIN_TEST inline_string_3_character
 	ldr	r2,=inline_string_3_character_expected
 	bl	text_eq
 
-	ASSERT_EQ "did not match\n" 
+	ASSERT  EQ,  "did not match\n" 
 END_TEST
 
 BEGIN_TEST inline_string_4_character
@@ -104,7 +104,7 @@ BEGIN_TEST inline_string_4_character
 	ldr	r2,=inline_string_4_character_expected
 	bl	text_eq
 
-	ASSERT_EQ "did not match\n" 
+	ASSERT  EQ,  "did not match\n" 
 END_TEST
 
 BEGIN_TEST reverse_text_empty
@@ -114,7 +114,7 @@ BEGIN_TEST reverse_text_empty
 	mov	r2, r0
 	INLINE r1, ""
 	bl	text_eq
-	ASSERT_EQ "reverse_string did not work for empty string\n"
+	ASSERT  EQ,  "reverse_string did not work for empty string\n"
 END_TEST
 
 BEGIN_TEST reverse_text_even
@@ -124,7 +124,7 @@ BEGIN_TEST reverse_text_even
 	mov	r2, r0
 	INLINE	r1, "dcba"
 	bl	text_eq
-	ASSERT_EQ "reverse_string did not work for even number of characters\n"
+	ASSERT  EQ,  "reverse_string did not work for even number of characters\n"
 END_TEST
 
 BEGIN_TEST reverse_text_odd
@@ -134,7 +134,7 @@ BEGIN_TEST reverse_text_odd
 	mov	r2, r0
 	INLINE	r1, "cba"
 	bl	text_eq
-	ASSERT_EQ "reverse_string did not work for odd number of characters\n"
+	ASSERT  EQ,  "reverse_string did not work for odd number of characters\n"
 END_TEST
 
 
@@ -142,7 +142,7 @@ BEGIN_TEST digit_to_text_test
 	mov	r0, #4
 	bl	digit_to_text
 	cmp	r0, #'4'
-	ASSERT_EQ "digit_to_text did not convert 4 to '4'\n"
+	ASSERT  EQ,  "digit_to_text did not convert 4 to '4'\n"
 END_TEST
 
 
@@ -153,7 +153,7 @@ BEGIN_TEST shift_10_zero
 	cmp	r0, #0
 	cmpeq	r1, #0
 
-	ASSERT_EQ "was not zero\n"
+	ASSERT  EQ,  "was not zero\n"
 END_TEST
 
 
@@ -164,7 +164,7 @@ BEGIN_TEST shift_10_one_digit
 	cmp	r0, #0
 	cmpeq	r1, #1
 
-	ASSERT_EQ "test_shift_10_one_digit failed\n"
+	ASSERT  EQ,  "test_shift_10_one_digit failed\n"
 END_TEST
 
 
@@ -175,7 +175,7 @@ BEGIN_TEST shift_10_two_digits
 	cmp	r0, #4
 	cmpeq	r1, #2
 	
-	ASSERT_EQ "test_shift_10_two_digits failed\n"
+	ASSERT  EQ,  "test_shift_10_two_digits failed\n"
 END_TEST
 
 
@@ -185,16 +185,16 @@ BEGIN_TEST int_to_text_zero
 	bl	int_to_text
 	
 	cmp	r0, #1
-	ASSERT_EQ "did not return length\n"
+	ASSERT  EQ,  "did not return length\n"
 
 	ldr	r2, =buffer
 	cmp	r1, r2
-	ASSERT_EQ "did not return buffer\n"
+	ASSERT  EQ,  "did not return buffer\n"
 
 	INLINE	r2, "0"
 
 	bl	text_eq
-	ASSERT_EQ "did not convert int correctly\n"
+	ASSERT  EQ,  "did not convert int correctly\n"
 END_TEST
 
 
@@ -204,15 +204,15 @@ BEGIN_TEST int_to_text_one_digit
 	bl	int_to_text
 	
 	cmp	r0, #1
-	ASSERT_EQ "did not return length\n"
+	ASSERT  EQ,  "did not return length\n"
 
 	ldr	r2, =buffer
 	cmp	r1, r2
-	ASSERT_EQ "did not return buffer\n"
+	ASSERT  EQ,  "did not return buffer\n"
 
 	INLINE	r2, "1"
 	bl	text_eq
-	ASSERT_EQ "did not convert int correctly\n"
+	ASSERT  EQ,  "did not convert int correctly\n"
 END_TEST
 
 BEGIN_TEST int_to_text_even_digit
@@ -221,15 +221,15 @@ BEGIN_TEST int_to_text_even_digit
 	bl	int_to_text
 	
 	cmp	r0, #1
-	ASSERT_EQ "did not return length\n"
+	ASSERT  EQ,  "did not return length\n"
 
 	ldr	r2, =buffer
 	cmp	r1, r2
-	ASSERT_EQ "did not return buffer\n"
+	ASSERT  EQ,  "did not return buffer\n"
 
 	INLINE	r2, "2"
 	bl	text_eq
-	ASSERT_EQ "did not convert int correctly\n"
+	ASSERT  EQ,  "did not convert int correctly\n"
 END_TEST
 
 BEGIN_TEST int_to_text_two_digits
@@ -238,15 +238,15 @@ BEGIN_TEST int_to_text_two_digits
 	bl	int_to_text
 	
 	cmp	r0, #2
-	ASSERT_EQ "did not return length\n"
+	ASSERT  EQ,  "did not return length\n"
 
 	ldr	r2, =buffer
 	cmp	r1, r2
-	ASSERT_EQ "did not return buffer\n"
+	ASSERT  EQ,  "did not return buffer\n"
 
 	INLINE r2, "42"
 	bl	text_eq
-	ASSERT_EQ "did not convert int correctly\n"
+	ASSERT  EQ,  "did not convert int correctly\n"
 END_TEST
 
 
@@ -256,7 +256,7 @@ BEGIN_TEST text_to_int_empty_string
 	bl	text_to_int
 	cmp	r0, #0
 
-	ASSERT_EQ "empty string is not zero\n"
+	ASSERT  EQ,  "empty string is not zero\n"
 END_TEST
 
 BEGIN_TEST text_to_int_one_digit
@@ -264,7 +264,7 @@ BEGIN_TEST text_to_int_one_digit
 	bl	text_to_int
 	cmp	r0, #5
 
-	ASSERT_EQ "'5' is not 5\n"
+	ASSERT  EQ,  "'5' is not 5\n"
 END_TEST
 
 BEGIN_TEST text_to_int_two_digits
@@ -272,7 +272,7 @@ BEGIN_TEST text_to_int_two_digits
 	bl	text_to_int
 	cmp	r0, #42
 
-	ASSERT_EQ "'42' is not 42\n"
+	ASSERT  EQ,  "'42' is not 42\n"
 END_TEST
 
 BEGIN_TEST text_to_int_invalid
@@ -280,7 +280,7 @@ BEGIN_TEST text_to_int_invalid
 	bl	text_to_int
 	cmp 	r0, #-1
 
-	ASSERT_EQ "invalid is not -1\n"
+	ASSERT  EQ,  "invalid is not -1\n"
 END_TEST
 
 BEGIN_TEST copy_string_test
@@ -293,7 +293,7 @@ BEGIN_TEST copy_string_test
 	ldr	r1, =buffer
 	bl	text_eq
 
-	ASSERT_EQ "did not copy string"
+	ASSERT  EQ,  "did not copy string"
 
 END_TEST
 
@@ -307,7 +307,7 @@ BEGIN_TEST add_nl_test
 	INLINE	r2, "a test\n"
 	bl	text_eq
 
-	ASSERT_EQ "did not append nl"
+	ASSERT  EQ,  "did not append nl"
 END_TEST
 
 BEGIN_TEST add_nl_not_needed
@@ -320,7 +320,7 @@ BEGIN_TEST add_nl_not_needed
 	INLINE	r2, "a test\n"
 	bl	text_eq
 
-	ASSERT_EQ "did not append nl"
+	ASSERT  EQ,  "did not append nl"
 END_TEST
 
 

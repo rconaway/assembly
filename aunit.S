@@ -38,8 +38,8 @@ test_list:
 	b fail_test
 .endm
 
-.macro	ASSERT_EQ message
-	beq	1f
+.macro	ASSERT condition, message
+	b\condition	1f
 	INLINE r1, "FAILURE: "
 	bl	out
 	bl	inline_string
