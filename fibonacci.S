@@ -7,13 +7,10 @@
 
 usage_text:
 	.ascii	"Usage: fibonacci <count>\n"
-	.equ	usage_text_len, .-usage_text
 
 display_buffer:
 	.space	100
 
-.set	argc, -24
-	.set	argv, -28
 	.set	n, -16
 	.set 	i, -8
 	.set	c, -12
@@ -29,81 +26,31 @@ display_buffer:
 	
 	.global	system
 system:
-	@ make sure we have a command-line parameter
-	ldr	r0, [sp]
-	cmp	r0, #2
+	bl	parse_command_line
+	cmp	r0, #-1
 	blt	usage
-
-	ldr	r1, [sp, #8]
-	bl	atoi
 
 	mov	r8, r0
 	mov	r7, #1
 
 loop:
 	cmp	r7, r8
-	bgt	end
+	movgt	r0, #0
+	bgt	exit
 
 	mov	r0, r7
-	bl	fibonacci
+	//bl	fibonacci
 	ldr	r1, =display_buffer
-	bl	itoa
-	mov	r2, #13
-	strb	r2,[r1],#1
-	mov	r2, r1
-	sub	r2, #display_buffer
-	mov	r0, #1
-	mov	r7, #4
-	swi	0
-
-	b 	exit
-
-
-
+	bl	int_to_text
+	bl	add_nl
+	bl	out
 	
-	@ call Fibonacci, passing i as argument
-	ldr	r0, [fp, #i]
-	bl	fibonacci
-	mov	r3, r0
-
-	@ print the result	
-	@ldr	r0, .format_ref
-	mov	r1, r3
-	@bl	printf
-
-	@ add 1 to n
-	ldr	r3, [fp, #i]
-	add	r3, r3, #1
-	str	r3, [fp, #i]
-
-	@ add 1 to c
-	ldr	r3, [fp, #-12]
-	add	r3, r3, #1
-	str	r3, [fp, #-12]
-
-.LOOP_TEST:
-	ldr	r2, [fp, #c]
-	ldr	r3, [fp, #n]
-	cmp	r2, r3
-	ble	loop
-
-	@ return with exit code 0
-	mov	r3, #0
-	mov	r0, r3
-
-	# restore the context from caller
-	sub	sp, fp, #4
-	@ sp needed
-	ldmfd	sp!, {fp, pc}
-
-.END_OF_MAIN:
+	add	r7, #1
+	b	loop
 
 usage:
-	mov	r7, #write 
-	mov	r0, #stdout
-	mov	r2, #usage_text_len
 	ldr	r1, =usage_text
-	swi 	0
+	bl	out
 
 	mov 	r0, #-1
 	b	exit
@@ -171,28 +118,34 @@ fibonacci:
 itoa:
 	mov	pc, lr
 
-atoi:
-	stmfd	sp!, {r4}
-	mov	r0, #0
-	mov	r3, #10
+/*
+	parse_command_line - get count from command line
 
-atoi_loop:	
-	ldrb	r2, [r1], #1
-	cmp	r2, #0
-	beq	atoi_end
+	on entry:
+	    stack + 0 = parameter count
+	    stack + 4 => name of program (null-terminated)
+	    stack + 8 => first parameter (null-terminated)
+	on exit:
+	    r0 = count or -1 if error
+*/
+
+	.global parse_command_line		
+parse_command_line:
+	push	{lr}
+
+	// make sure there is at least 1 parameter beyond prog name
+	ldr	r0, [sp, #4]
+	cmp	r0, #2
+
+	movlt	r0, #-1	
+	blt	parse_command_line_exit
+
+	// parse parameter 1 (prog name is parameter 0)
+	ldr	r1, [sp, #12]
+	bl	text_to_int
+
+	// if not parsed, r0 is already -1
 	
-	cmp	r2, #0x30
-	blt	usage
-	cmp	r2, #0x39
-	bgt	usage
-
-	mul	r4, r0, r3
-	mov	r0, r4
-	sub	r2, r2, #0x30
-	add	r0, r0, r2
-	b	atoi_loop
-
-atoi_end:
-	ldmfd	sp!, {r4}
-	mov	pc, lr		
+parse_command_line_exit:
+	pop	{pc}	
 

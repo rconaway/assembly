@@ -4,6 +4,7 @@
 	.data 
 failures:	.word	0
 fail_message:	.asciz "FAILED\n"
+message:	.space 1000
 
 .macro BEGIN_TEST_LIST
 	.data
@@ -39,12 +40,25 @@ test_list:
 
 .macro	ASSERT_EQ message
 	beq	1f
+	INLINE r1, "FAILURE: "
+	bl	out
 	bl	inline_string
 	.asciz "\message"
 	.align 4
-	pop	{r1}
+	pop	{r2}
+	ldr	r1, =message
+	bl 	copy_string
+	ldr	r1, =message	
+	bl	add_nl
 	bl	out
+
+	ldr	r1, =failures
+	ldr	r0, [r1]
+	add 	r0, #1
+	str	r0, [r1]
+
 	b	next_test
+	.ltorg
 1:
 .endm
 

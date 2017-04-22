@@ -215,6 +215,23 @@ BEGIN_TEST int_to_text_one_digit
 	ASSERT_EQ "did not convert int correctly\n"
 END_TEST
 
+BEGIN_TEST int_to_text_even_digit
+	mov	r0, #2
+	ldr	r1, =buffer	
+	bl	int_to_text
+	
+	cmp	r0, #1
+	ASSERT_EQ "did not return length\n"
+
+	ldr	r2, =buffer
+	cmp	r1, r2
+	ASSERT_EQ "did not return buffer\n"
+
+	INLINE	r2, "2"
+	bl	text_eq
+	ASSERT_EQ "did not convert int correctly\n"
+END_TEST
+
 BEGIN_TEST int_to_text_two_digits
 	mov	r0, #42
 	ldr	r1, =buffer	
@@ -225,12 +242,87 @@ BEGIN_TEST int_to_text_two_digits
 
 	ldr	r2, =buffer
 	cmp	r1, r2
-	ASSERT_EQ "dod not return buffer\n"
+	ASSERT_EQ "did not return buffer\n"
 
 	INLINE r2, "42"
 	bl	text_eq
 	ASSERT_EQ "did not convert int correctly\n"
 END_TEST
+
+
+
+BEGIN_TEST text_to_int_empty_string
+	INLINE	r1, ""
+	bl	text_to_int
+	cmp	r0, #0
+
+	ASSERT_EQ "empty string is not zero\n"
+END_TEST
+
+BEGIN_TEST text_to_int_one_digit
+	INLINE	r1, "5"
+	bl	text_to_int
+	cmp	r0, #5
+
+	ASSERT_EQ "'5' is not 5\n"
+END_TEST
+
+BEGIN_TEST text_to_int_two_digits
+	INLINE r1, "42"
+	bl	text_to_int
+	cmp	r0, #42
+
+	ASSERT_EQ "'42' is not 42\n"
+END_TEST
+
+BEGIN_TEST text_to_int_invalid
+	INLINE r1, "1foo"
+	bl	text_to_int
+	cmp 	r0, #-1
+
+	ASSERT_EQ "invalid is not -1\n"
+END_TEST
+
+BEGIN_TEST copy_string_test
+	INLINE	r2, "a test"
+	ldr	r1, =buffer
+
+	bl	copy_string
+
+	INLINE	r2, "a test"
+	ldr	r1, =buffer
+	bl	text_eq
+
+	ASSERT_EQ "did not copy string"
+
+END_TEST
+
+BEGIN_TEST add_nl_test
+	INLINE	r2, "a test"
+	ldr	r1, =buffer
+	bl	copy_string
+	ldr	r1, =buffer
+	bl	add_nl
+
+	INLINE	r2, "a test\n"
+	bl	text_eq
+
+	ASSERT_EQ "did not append nl"
+END_TEST
+
+BEGIN_TEST add_nl_not_needed
+	INLINE	r2, "a test\n"
+	ldr	r1, =buffer
+	bl	copy_string
+	ldr	r1, =buffer
+	bl	add_nl
+
+	INLINE	r2, "a test\n"
+	bl	text_eq
+
+	ASSERT_EQ "did not append nl"
+END_TEST
+
 
 END_TEST_LIST
 

@@ -195,6 +195,8 @@ int_to_text_loop:
 	cmp	r2, #0
 	bne	int_to_text_loop
 
+	mov	r0, #0
+	strb	r0, [r3]
 	mov	r0, r4
 	bl	reverse_text
 
@@ -277,4 +279,86 @@ digit_to_text:
 	add	r0, #'0'
 	mov	pc, lr
 
+
+	.global text_to_int
+text_to_int:
+	push	{r4}
+	mov	r0, #0
+	mov	r3, #10
+
+text_to_int_loop:	
+	ldrb	r2, [r1], #1
+	cmp	r2, #0
+	beq	text_to_int_end
+	
+	cmp	r2, #'0'
+	blt	text_to_int_error
+	cmp	r2, #'9'
+	bgt	text_to_int_error
+
+	mul	r4, r0, r3
+	mov	r0, r4
+	sub	r2, r2, #0x30
+	add	r0, r0, r2
+	b	text_to_int_loop
+
+text_to_int_end:
+	pop	{r4}
+	mov	pc, lr		
+
+text_to_int_error:
+	mov	r0, #-1
+	b	text_to_int_end
+
+
+/*
+	copy_string
+
+	on entry:
+	    r1 => destination buffer
+	    r2 => source string
+	on exit:
+	    undefined
+*/
+	.global copy_string
+copy_string:
+	ldrb	r0, [r2], #1
+	strb	r0, [r1], #1
+	cmp	r0, #0
+	bne	copy_string
+
+	mov	pc, lr
+
+/*
+	add_nl
+
+	on entry:
+	    r1 => null-terminated string
+	on exit:
+	    r1 is unchanged
+*/
+	.global add_nl
+add_nl:
+	push	{r1, lr}
+
+1:
+	ldrb	r0, [r1]
+	cmp	r0, #0
+	beq	2f
+
+	mov	r2, r0
+	add	r1, #1
+	b	1b
+
+2:
+	cmp	r2, #'\n'
+	beq	add_nl_exit
+	
+	mov	r0, #'\n'
+	strb	r0, [r1],#1
+	mov	r0, #0
+	strb	r0, [r1]
+
+add_nl_exit:
+	pop	{r1, pc}
 
