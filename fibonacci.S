@@ -1,8 +1,5 @@
 	.file	"fibonacci.S"
 
-	.equ	write, 4
-	.equ	stdout, 1
-
 	.data
 
 usage_text:
@@ -11,18 +8,8 @@ usage_text:
 display_buffer:
 	.space	100
 
-	.set	n, -16
-	.set 	i, -8
-	.set	c, -12
 
-	.set	fib_n, -16
-
-	.file	"fibonacci.S"
-	.align	2
-
-.format:
-	.ascii	"%d\n\0"
-	
+	.text	
 	
 	.global	system
 system:
