@@ -83,15 +83,14 @@ here_is:
 
 	.global inline_string
 inline_string:
-	add	sp, #4
-	push	{r0,r1}
-	mov	r1, lr
+	push	{lr}	// pointer to string
+	push	{r0}
 
 	// advance lr to the null-terminator
-inline_string_skip:
+1:
 	ldrb	r0, [lr], #1
 	cmp	r0, #0
-	bne	inline_string_skip
+	bne	1b
 
 	// align to next word boundary, if necessary
 	ands	r0, lr, #3
@@ -100,9 +99,8 @@ inline_string_skip:
 	add	lr, #4
 
 inline_string_end:
-	str	r1, [sp, #8]
 	// "return" to the instruction after the string
-	pop	{r0,r1}
+	pop	{r0}
 	mov	pc, lr
 
 /*

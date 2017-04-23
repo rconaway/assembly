@@ -34,13 +34,17 @@ test_list:
 	b	next_test
 .endm
 
-.macro FAIL
-	b fail_test
+.macro	a_eq  message
+	assert eq, "\message"
 .endm
 
-.macro	ASSERT condition, message
+.macro	a_ne message
+	assert ne, "\message"
+.endm
+
+.macro	assert condition, message
 	b\condition	1f
-	load_string r1, "FAILURE: "
+	ld_rs 	r1, "\033[31mFAILURE: "
 	bl	out
 	bl	inline_string
 	.asciz "\message"
@@ -50,6 +54,8 @@ test_list:
 	bl 	copy_string
 	ldr	r1, =message	
 	bl	add_nl
+	bl	out
+	ld_rs	r1, "\033[0m"
 	bl	out
 
 	ldr	r1, =failures
@@ -62,18 +68,14 @@ test_list:
 1:
 .endm
 
-.macro inline register,string
-	load_string \register, \string
-.endm
-
-.macro load_string  register, string
+.macro ld_rs  register, string
 	bl	inline_string
 	.asciz	"\string"
 	.align 4
 	pop	{\register}
 .endm
 
-.macro store_string	buffer, string
+.macro st_bs	buffer, string
 	push	{r1, r2}
 	bl	inline_string
 	.asciz	"\string"
@@ -84,7 +86,7 @@ test_list:
 	pop	{r1,r2}
 .endm
 
-.macro	test_string	buffer, string
+.macro	cmp_bs	buffer, string
 	push	{r1, r2}
 	bl	inline_string
 	.asciz	"\string"
@@ -95,7 +97,7 @@ test_list:
 	pop	{r1, r2}
 .endm
 
-.macro	cmp_string	register, string
+.macro	cmp_rs	register, string
 	push	{r1, r2}
 	mov	r1, \register
 	bl	inline_string
@@ -105,6 +107,7 @@ test_list:
 	bl	text_eq
 	pop	{r1, r2}
 .endm
+
 	.global _start
 _start:
         nop
@@ -125,19 +128,28 @@ skip_name:
         mov     pc, r10
 
 after_test:
-
         ldr     r1, =failures   
         ldr     r0, [r1]
+	cmp	r0, #0
+	beq	success
+
+	mov	r7, r0
+	ld_rs	r1, "\033[31m"
+	bl	out
+	mov	r0, r7
+	ldr	r1, =message
+	bl	int_to_text
+	bl	out
+	ld_rs	r1, " TESTS FAILED\033[0m\n"
+	bl	out
+	b	exit
+
+success:
+	ld_rs	r1, "\033[32mPASSED\033[0m\n"
+	bl	out
+	mov	r0, #0
+
+exit:
         mov     r7, #1
         swi     0
-
-fail_test:
-	ldr	r1, =fail_message
-	bl	out
-	@bl	report_registers
-	ldr	r1, =failures
-	ldr	r0, [r1]
-	add	r0, #1
-	str	r0, [r1]
-	b next_test
 
