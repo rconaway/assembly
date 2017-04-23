@@ -40,7 +40,7 @@ test_list:
 
 .macro	ASSERT condition, message
 	b\condition	1f
-	INLINE r1, "FAILURE: "
+	load_string r1, "FAILURE: "
 	bl	out
 	bl	inline_string
 	.asciz "\message"
@@ -62,13 +62,49 @@ test_list:
 1:
 .endm
 
-.macro INLINE register, string
+.macro inline register,string
+	load_string \register, \string
+.endm
+
+.macro load_string  register, string
 	bl	inline_string
 	.asciz	"\string"
 	.align 4
 	pop	{\register}
 .endm
 
+.macro store_string	buffer, string
+	push	{r1, r2}
+	bl	inline_string
+	.asciz	"\string"
+	.align 4
+	pop	{r2}
+	ldr	r1, =\buffer
+	bl	copy_string
+	pop	{r1,r2}
+.endm
+
+.macro	test_string	buffer, string
+	push	{r1, r2}
+	bl	inline_string
+	.asciz	"\string"
+	.align  4
+	pop	{r2}
+	ldr	r1, =\buffer
+	bl	text_eq
+	pop	{r1, r2}
+.endm
+
+.macro	cmp_string	register, string
+	push	{r1, r2}
+	mov	r1, \register
+	bl	inline_string
+	.asciz	"\string"
+	.align  4
+	pop	{r2}
+	bl	text_eq
+	pop	{r1, r2}
+.endm
 	.global _start
 _start:
         nop
@@ -96,7 +132,6 @@ after_test:
         swi     0
 
 fail_test:
-	bl	save_registers
 	ldr	r1, =fail_message
 	bl	out
 	@bl	report_registers

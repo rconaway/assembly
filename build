@@ -3,16 +3,13 @@ rm bin/*
 as -ggdb -o bin/main.o main.S || exit -1
 as -ggdb -o bin/fibonacci.o fibonacci.S || exit -1
 as -ggdb -o bin/fibonacci_test.o fibonacci_test.S || exit -1
-as -ggdb -o bin/aunit_test.o aunit_test.S || exit -1
 as -ggdb -o bin/common.o common.S || exit -1
 as -ggdb -o bin/common_test.o common_test.S || exit -1
 
 ld -o bin/main bin/main.o bin/fibonacci.o bin/common.o || exit -1
 ld -o bin/fibonacci_test bin/fibonacci_test.o bin/fibonacci.o bin/common.o || exit -1
-ld -o bin/aunit_test bin/aunit_test.o bin/common.o || exit -1
 ld -o bin/common_test bin/common_test.o bin/common.o || exit -1
 
-bin/aunit_test || exit -1
 bin/fibonacci_test || exit -1
 bin/common_test || exit -1
 

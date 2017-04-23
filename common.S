@@ -81,28 +81,6 @@ here_is:
 
 	b	inline_string
 
-	.global save_registers
-save_registers:
-	push	{r0, r1}
-	ldr	r1, =saved_registers
-	stmia	r1, {r0-r14}
-
-	// get r1 off the stack
-	ldr	r0, [sp, #4]
-	str	r0, [r1, #4]
-
-	// get lr off the stack
-	ldr	r0, [sp, #8]
-	str	r0, [r1, #56]
-
-	pop	{r0, r1}
-	ldr	r1, =saved_registers
-	mov	pc, lr
-
-	.global interpolate_registers	
-interpolate_registers:
-	mov	pc, lr
-
 	.global inline_string
 inline_string:
 	add	sp, #4
@@ -171,12 +149,11 @@ reverse_text_exit:
 		r0 = integer to convert
 		r1 = buffer to place the text
 	on exit:
-		r0 = length of text
 		r1 = original buffer
 */
 	.global int_to_text
 int_to_text:
-	push	{r1, r2, r3,r4, lr}
+	push	{r1, r4, lr}
 
 	mov	r4, r1
 
@@ -200,13 +177,10 @@ int_to_text_loop:
 	mov	r0, r4
 	bl	reverse_text
 
-	mov	r0, r3 
-	sub	r0, r4
-
 	mov	r1, #0
 	strb	r1, [r3]
 
-	pop	{r1, r2, r3, r4, pc}
+	pop	{r1, r4, pc}
 
 itoa:
 	@ > r0 = i

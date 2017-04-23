@@ -8,44 +8,11 @@ usage_text:
 display_buffer:
 	.space	100
 
-
 	.text	
 	
 	.global	system
 system:
 	bl	parse_command_line
-	cmp	r0, #-1
-	blt	usage
-
-	mov	r8, r0
-	mov	r7, #1
-
-loop:
-	cmp	r7, r8
-	movgt	r0, #0
-	bgt	exit
-
-	mov	r0, r7
-	bl	fibonacci
-	ldr	r1, =display_buffer
-	bl	int_to_text
-	bl	add_nl
-	bl	out
-	
-	add	r7, #1
-	b	loop
-
-usage:
-	ldr	r1, =usage_text
-	bl	out
-
-	mov 	r0, #-1
-	b	exit
-
-exit:
-	mov	r7, #1
-	swi	0
-	
 	.global fibonacci
 fibonacci:
 	push	{r4,r5,lr}
@@ -72,26 +39,25 @@ fibonacci_exit:
 	    stack + 4 => name of program (null-terminated)
 	    stack + 8 => first parameter (null-terminated)
 	on exit:
-	    r0 = count or -1 if error
+	    Z if successful, NZ if failure
+	    r0 = count if Z
 */
 
 	.global parse_command_line		
 parse_command_line:
-	push	{lr}
+	push	{lr}	// this adds 4 to the offsets
 
 	// make sure there is at least 1 parameter beyond prog name
 	ldr	r0, [sp, #4]
 	cmp	r0, #2
-
-	movlt	r0, #-1	
-	blt	parse_command_line_exit
+	blt	parse_command_line_exit	
 
 	// parse parameter 1 (prog name is parameter 0)
 	ldr	r1, [sp, #12]
 	bl	text_to_int
 
-	// if not parsed, r0 is already -1
-	
-parse_command_line_exit:
-	pop	{pc}	
+	// if failure during parse, Z is already off
+
+parse_command_line_exit:	
+ 	pop	{pc}	
 

@@ -12,9 +12,7 @@ BEGIN_TEST parse_command_line_no_parameter
 	push	{r0, r1}
 
 	bl	parse_command_line
-	cmp	r0, #-1
-	ASSERT EQ "did not fail on no parameter"
-
+	assert	ne, "did not fail on no parameter"
 END_TEST
 
 BEGIN_TEST parse_command_line_invalid_parameter
@@ -24,8 +22,7 @@ BEGIN_TEST parse_command_line_invalid_parameter
 	push	{r0,r1,r2}
 
 	bl parse_command_line
-	cmp	r0, #-1
-	ASSERT EQ "did not fail on invalid parameter"
+	assert	ne, "did not fail on invalid parameter"
 END_TEST
 
 BEGIN_TEST parse_command_line_valid
@@ -35,8 +32,10 @@ BEGIN_TEST parse_command_line_valid
 	push	{r0, r1, r2}
 
 	bl 	parse_command_line
+	assert	eq, "failed parsing valid parameter"
+
 	cmp	r0, #42
-	ASSERT EQ "did not convert parameter correctly"
+	assert	eq, "did not convert parameter correctly"
 END_TEST
 
 BEGIN_TEST fibonacci_1
