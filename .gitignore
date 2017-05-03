@@ -9,3 +9,5 @@ hello
 *.s
 .gdb_history
 bin/
+.idea/
+target/

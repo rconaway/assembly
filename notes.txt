@@ -1,0 +1,179 @@
+	.data
+str:	.asciz "Hello World\n"
+
+	.short	10
+	.hword	10
+
+	.long	100
+	.word	100
+
+str:	.ascii	"some text\n"
+	.equ	str_len, (. - str) / 4
+
+	.asciz	"some terminated text\n"
+
+	.align	4
+
+	.equ	a_symbol, 10
+
+	.text
+	.global _start
+_start:	nop
+
+--------------------------------------------------------
+ARM condition modifiers
+
+<cond>	English Meaning
+al	always (this is the default <cond>
+eq	Z set (=)
+ne	Z clear (≠)
+ge	N set and V set, or N clear and V clear (≥)
+lt	N set and V clear, or N clear and V set (<)
+gt	Z clear, and either N set and V set, or N clear and V set (>)
+le	Z set, or N set and V clear, or N clear and V set (≤)
+hi	C set and Z clear (unsigned >)
+ls	C clear or Z (unsigned ≤)
+hs	C set (unsigned ≥)
+cs	Alternate name for HS
+lo	C clear (unsigned <)
+cc	Alternate name for LO
+mi	N set (result < 0)
+pl	N clear (result ≥ 0)
+vs	V set (overflow)
+vc	V clear (no overflow)
+
+--------------------------------------------------------
+ARM size modifiers
+
+b	unsigned byte
+h	unsigned half-word
+sb	signed byte
+sh	signed half-word
+
+--------------------------------------------------------
+Legal and illegal values for #<immediate—symbol>
+
+#32	Ok because it can be stored as an 8-bit value
+#1021	Illegal because the number cannot be created from an 8-bit value using shift or rotate and complement
+#1024	Ok because it is 1 shifted left 10 bits
+#0b1011	Ok because it fits in 8 bits
+#-1	Ok because it is the one’s complement of 0
+#0xFFFFFFFE	Ok because it is the one’s complement of 1
+#0xEFFFFFFF	Ok because it is the one’s complement of 1 shifted left 31 bits
+#strsize	Ok if the value of strsize can be created from an 8-bit value using shift or rotate and complement
+
+
+---------------------------------------------------------
+ARM shift and rotate operations
+ft>	Meaning
+lsl	Logical Shift Left by specified amount
+lsr	Logical Shift Right by specified amount
+asr	Arithmetic Shift Right by specified amount
+
+
+--------------------------------------------------------
+ARM addressing modes
+
+Syntax	Name
+[Rn, #±<offset_12>]		Immediate offset		ldr	r0, [r1, #12]		r0 <- [r1 + 12]
+[Rn]				Register immediate]		ldr	r0, [r1] 		r0 <= [r1]
+	
+[Rn, ±Rm, <shift_op> #<shift>]	Scaled register offset		ldr	r3, [r2, r1, lsl #2] 	r3 <- [r2 + r1 << 2]
+				Register offset			ldr	r3, [r2, r1] 		r3 <- [r2 + r1]
+
+[Rn, #±<offset_12>]!		Immediate pre-indexed		ldr	r0, [r1, #12]!		r0 <- [r1 + 12], 
+										        	r1 <- r1 + 12
+
+[Rn, ±Rm, <shift_op> #<shift>]!	Scaled register pre-indexed	ldr	r3, [r2, r1, lsl #2]! 	r3 <- [r2 + r1 << 2], 
+											      	r2 <- r2 + r1 << 2
+
+[Rn], #±<offset_12>		Immediate post-indexed		ldr	r0, [r1], #12 		r0 <- [r1], 
+										      		r1 <- r1 + 12
+
+[Rn], ±Rm, <shift_op> #<shift>	Scaled register post-indexed	ldr	r0, [r1], r2, lsl #2 	r0 <- [r1], 
+											     	r1 <- r1 + r2 << 2
+				Register post-indexed		ldr	r0, [r1], r2		r0 <- [r1]
+												r1 <- r1 + r2
+
+				Load immediate			ldr	r0, =Foo		r0 <- value of Foo
+
+
+-------------------------------------------------------
+Load/Store
+
+Single Register	(ldr/str)	<op>{<cond>}{<size>} Rd, address	ldr eq b  r0,[r1]    
+										load byte from [r1] into r0 if z
+
+Multiple Registers (ldm, stm)	<op><variant> Rd{!}, <register_list>
+
+Block Copy Method		Stack Type
+Variant	Description		Variant	Description
+ia	Increment After		ea	Empty Ascending
+ib	Increment Before	fa	Full Ascending
+da	Decrement After		ed	Empty Descending
+db	Decrement Before	fd	Full Descending
+
+				ldr	r8, =source
+				ldr	r9, =dest
+				ldmia	r8, {r0-r7}
+				stmia	r9, {r0-r7)
+
+				stmfd	sp!{r0-r9}
+				ldmfd	sp!{r0-r9}
+
+-----------------------------------------------------------
+comparison
+
+
+Name	Effect	Description
+cmp	Rn − operand2	Compare and set CPSR flags
+cmn	Rn + operand2	Compare negative and set CPSR flags
+tst	Rn ∧ operand2	Test bits and set CPSR flags
+teq	Rn ⊕ operand2	Test equivalence and set CPSR flags
+
+------------------------------------------------------------
+arithmetic
+
+add, adc, sub, sbc, rsb, rsc
+
+				<op>{<cond>}{s} Rd, Rn, Operand2
+
+
+------------------------------------------------------------
+logical
+
+and, orr, eor, orn, bic
+
+				<op>{<cond>}{s} Rd, Rn, Operand2
+
+-------------------------------------------------------------
+data movement
+
+mov, mvn		<op>{<cond>}{s} Rd, Operand2
+movt			movt{<cond>} Rd, #immed16
+
+-------------------------------------------------------------
+multiply / divide
+
+mul, mla
+
+Name	Effect	Description
+smull	si18_e	Signed Multiply
+umult	si18_e	Unsigned Multiply
+smlal	si20_e	Signed Multiply and Accumulate
+umlal	si20_e	Unsigned Multiply and Accumulate
+
+sdiv, udiv
+
+------------------------------------------------------------
+
+clz	count leading zeros
+mrs	move status to register
+msr	move register to status
+swi
+
+nop	== mov r0, r0
+lsl, lsr, asr, ror, rrx
+
+
+	
