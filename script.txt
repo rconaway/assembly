@@ -1,3 +1,17 @@
+Browser:
+    https://github.com/rconaway/assembly
+    https://en.wikipedia.org/wiki/ARM_architecture
+    https://en.wikipedia.org/wiki/Altair_8800
+    https://www.lucidchart.com/invitations/accept/6520fada-38c5-4a58-a750-6d7fedac6694
+    http://www.davespace.co.uk/arm/introduction-to-arm/conditional.html
+    http://lxr.free-electrons.com/source/arch/arm/kernel/calls.S?v=2.2.26
+ 
+Pi:
+    Hello.S
+    goh
+
+----------------------------------------------------------
+
 Rob Conaway
 Artisan at Pillar Technology
 rconaway at pillartechnology dot com
